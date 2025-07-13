@@ -1,0 +1,136 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color: #213547;
+  background-color: #ffffff;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: white;
+  text-decoration: inherit;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+
+body {
+  margin: 0 auto;           /* ✅ Tengah layar */
+  padding: 0 1rem;          /* ✅ Sedikit jarak sisi kiri-kanan */
+  box-sizing: border-box;   /* ✅ Hindari overflow */
+  background-color: #fff;   /* opsional: putih */
+}
+
+/* Navbar */
+.navbar {
+  background-color: #eb682f;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+}
+
+.navbar-left {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.navbar-right a {
+  margin-left: 1.5rem;
+  color: white;
+  text-decoration: none;
+}
+
+/* Banner */
+.banner {
+  background-color: #333;
+  color: white;
+  padding: 5rem 2rem 6rem;
+  position: relative;
+  background-image: url('/path-to-banner-image.jpg'); /* Ganti dengan gambar jika ada */
+  background-size: cover;
+  background-position: center;
+  text-align: center;
+  }
+.banner::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  border-bottom: 40px solid transparent;
+  border-left: 100% solid white;
+}
+
+/* Ideas section */
+.ideas-header {
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ideas-container {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+/* Card */
+.idea-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+.idea-card:hover {
+  transform: translateY(-4px);
+}
+.idea-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+.idea-card .card-body {
+  padding: 1rem;
+  text-align: left;
+}
+.idea-card .card-title {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.idea-card .card-date {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+.pagination button {
+  margin: 0 0.25rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: #ff6600;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.pagination button.active {
+  background-color: #d94d00;
+}
