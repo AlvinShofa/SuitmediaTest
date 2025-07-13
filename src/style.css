@@ -2,16 +2,14 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+
   color: #213547;
   background-color: #ffffff;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
 }
 
 a {
@@ -19,30 +17,16 @@ a {
   color: white;
   text-decoration: inherit;
 }
-
 a:hover {
   text-decoration: underline;
 }
 
-body {
-<<<<<<< HEAD
-  margin: 0;
-  padding: 0;
-  background-color: #fff;
-  overflow-x: hidden;
-}
 
-/* Responsive container */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-=======
-  margin: 0 auto;           
-  padding: 0 1rem;          
-  box-sizing: border-box;   
-  background-color: #fff;   
->>>>>>> 9c412fe03ab6c8baad1094d3e278b2929866017c
+body {
+  margin: 0 auto;           /* ✅ Tengah layar */
+  padding: 0 1rem;          /* ✅ Sedikit jarak sisi kiri-kanan */
+  box-sizing: border-box;   /* ✅ Hindari overflow */
+  background-color: #fff;   /* opsional: putih */
 }
 
 /* Navbar */
@@ -72,25 +56,18 @@ body {
   color: white;
   padding: 5rem 2rem 6rem;
   position: relative;
-<<<<<<< HEAD
-  background-image: url('/path-to-banner-image.jpg');
-=======
-  background-image: url('/path-to-banner-image.jpg'); 
->>>>>>> 9c412fe03ab6c8baad1094d3e278b2929866017c
+  background-image: url('/path-to-banner-image.jpg'); /* Ganti dengan gambar jika ada */
   background-size: cover;
   background-position: center;
   text-align: center;
-}
-
+  }
 .banner::after {
   content: '';
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 0;
-  height: 0;
-  border-left: 100vw solid white;
-  border-top: 40px solid transparent;
+  border-bottom: 40px solid transparent;
+  border-left: 100% solid white;
 }
 
 /* Ideas section */
@@ -114,31 +91,26 @@ body {
   background: white;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   transition: transform 0.2s;
 }
-
 .idea-card:hover {
   transform: translateY(-4px);
 }
-
 .idea-card img {
   width: 100%;
   height: 180px;
   object-fit: cover;
 }
-
 .idea-card .card-body {
   padding: 1rem;
   text-align: left;
 }
-
 .idea-card .card-title {
   font-size: 1rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
 }
-
 .idea-card .card-date {
   font-size: 0.8rem;
   color: #888;
@@ -149,10 +121,7 @@ body {
   display: flex;
   justify-content: center;
   padding: 2rem;
-  flex-wrap: wrap;
-  gap: 0.5rem;
 }
-
 .pagination button {
   margin: 0 0.25rem;
   padding: 0.5rem 1rem;
@@ -161,388 +130,7 @@ body {
   color: white;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
 }
-
-.pagination button:hover:not(:disabled) {
-  background-color: #e55a00;
-}
-
 .pagination button.active {
   background-color: #d94d00;
-}
-
-.pagination button:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-/* RESPONSIVE BREAKPOINTS */
-
-/* Tablet */
-@media (max-width: 768px) {
-  .container {
-    padding: 0 1rem;
-  }
-  
-  .navbar {
-    padding: 1rem;
-  }
-  
-  .navbar-left {
-    font-size: 1.1rem;
-  }
-  
-  .navbar-right a {
-    margin-left: 1rem;
-    font-size: 0.9rem;
-  }
-  
-  .banner {
-    padding: 4rem 1rem 5rem;
-  }
-  
-  .ideas-header {
-    padding: 1.5rem;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .ideas-container {
-    padding: 1.5rem;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
-  }
-  
-  .idea-card img {
-    height: 160px;
-  }
-  
-  .pagination {
-    padding: 1.5rem;
-  }
-  
-  .pagination button {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-  }
-}
-
-/* Mobile */
-@media (max-width: 480px) {
-  .container {
-    padding: 0 0.5rem;
-  }
-  
-  .navbar {
-    padding: 0.8rem;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .navbar-left {
-    font-size: 1rem;
-  }
-  
-  .navbar-right {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-  
-  .navbar-right a {
-    margin: 0;
-    padding: 0.3rem 0.6rem;
-    border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.1);
-    font-size: 0.8rem;
-  }
-  
-  .banner {
-    padding: 3rem 0.5rem 4rem;
-  }
-  
-  .ideas-header {
-    padding: 1rem;
-  }
-  
-  .ideas-container {
-    padding: 1rem;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .idea-card img {
-    height: 140px;
-  }
-  
-  .idea-card .card-body {
-    padding: 0.8rem;
-  }
-  
-  .idea-card .card-title {
-    font-size: 0.9rem;
-  }
-  
-  .idea-card .card-date {
-    font-size: 0.7rem;
-  }
-  
-  .pagination {
-    padding: 1rem;
-  }
-  
-  .pagination button {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.8rem;
-    margin: 0 0.1rem;
-  }
-}
-
-/* Small Mobile */
-@media (max-width: 360px) {
-  .navbar {
-    padding: 0.6rem;
-  }
-  
-  .navbar-left {
-    font-size: 0.9rem;
-  }
-  
-  .navbar-right a {
-    font-size: 0.7rem;
-    padding: 0.2rem 0.4rem;
-  }
-  
-  .banner {
-    padding: 2.5rem 0.3rem 3.5rem;
-  }
-  
-  .ideas-header {
-    padding: 0.8rem;
-  }
-  
-  .ideas-container {
-    padding: 0.8rem;
-    gap: 0.8rem;
-  }
-  
-  .idea-card img {
-    height: 120px;
-  }
-  
-  .idea-card .card-body {
-    padding: 0.6rem;
-  }
-  
-  .idea-card .card-title {
-    font-size: 0.8rem;
-  }
-  
-  .idea-card .card-date {
-    font-size: 0.65rem;
-  }
-  
-  .pagination {
-    padding: 0.8rem;
-  }
-  
-  .pagination button {
-    padding: 0.2rem 0.4rem;
-    font-size: 0.7rem;
-    margin: 0 0.05rem;
-  }
-}
-
-/* Utility classes */
-.text-center {
-  text-align: center;
-}
-
-.text-left {
-  text-align: left;
-}
-
-.text-right {
-  text-align: right;
-}
-
-.flex {
-  display: flex;
-}
-
-.flex-col {
-  flex-direction: column;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.justify-center {
-  justify-content: center;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.gap-1 {
-  gap: 0.25rem;
-}
-
-.gap-2 {
-  gap: 0.5rem;
-}
-
-.gap-3 {
-  gap: 0.75rem;
-}
-
-.gap-4 {
-  gap: 1rem;
-}
-
-.hidden {
-  display: none;
-}
-
-.visible {
-  visibility: visible;
-}
-
-.invisible {
-  visibility: hidden;
-}
-
-.opacity-0 {
-  opacity: 0;
-}
-
-.opacity-50 {
-  opacity: 0.5;
-}
-
-.opacity-100 {
-  opacity: 1;
-}
-
-.pointer-events-none {
-  pointer-events: none;
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.cursor-default {
-  cursor: default;
-}
-
-/* Loading states */
-.loading {
-  position: relative;
-  overflow: hidden;
-}
-
-.loading::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
-}
-
-/* Smooth transitions */
-.transition-all {
-  transition: all 0.3s ease;
-}
-
-.transition-transform {
-  transition: transform 0.3s ease;
-}
-
-.transition-opacity {
-  transition: opacity 0.3s ease;
-}
-
-/* Hover effects */
-.hover-lift:hover {
-  transform: translateY(-2px);
-}
-
-.hover-scale:hover {
-  transform: scale(1.05);
-}
-
-/* Focus states */
-*:focus {
-  outline: 2px solid #ff6600;
-  outline-offset: 2px;
-}
-
-button:focus,
-select:focus,
-input:focus {
-  outline: 2px solid #ff6600;
-  outline-offset: 1px;
-}
-
-/* Accessibility improvements */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* Print styles */
-@media print {
-  .navbar,
-  .pagination,
-  .filters {
-    display: none;
-  }
-  
-  .banner {
-    background-image: none;
-    color: black;
-  }
-  
-  .idea-card {
-    break-inside: avoid;
-    box-shadow: none;
-    border: 1px solid #ddd;
-  }
-}
-
-/* High contrast mode */
-@media (prefers-contrast: high) {
-  .idea-card {
-    border: 2px solid #000;
-  }
-  
-  .pagination button {
-    border: 2px solid #000;
-  }
-  
-  .navbar {
-    border-bottom: 2px solid #000;
-  }
 }
