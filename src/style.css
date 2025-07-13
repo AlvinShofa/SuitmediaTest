@@ -23,10 +23,10 @@ a:hover {
 
 
 body {
-  margin: 0 auto;           /* ✅ Tengah layar */
-  padding: 0 1rem;          /* ✅ Sedikit jarak sisi kiri-kanan */
-  box-sizing: border-box;   /* ✅ Hindari overflow */
-  background-color: #fff;   /* opsional: putih */
+  margin: 0 auto;           
+  padding: 0 1rem;          
+  box-sizing: border-box;   
+  background-color: #fff;   
 }
 
 /* Navbar */
@@ -56,7 +56,7 @@ body {
   color: white;
   padding: 5rem 2rem 6rem;
   position: relative;
-  background-image: url('/path-to-banner-image.jpg'); /* Ganti dengan gambar jika ada */
+  background-image: url('/path-to-banner-image.jpg'); 
   background-size: cover;
   background-position: center;
   text-align: center;
