@@ -25,6 +25,7 @@ a:hover {
 }
 
 body {
+<<<<<<< HEAD
   margin: 0;
   padding: 0;
   background-color: #fff;
@@ -36,6 +37,12 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
+=======
+  margin: 0 auto;           
+  padding: 0 1rem;          
+  box-sizing: border-box;   
+  background-color: #fff;   
+>>>>>>> 9c412fe03ab6c8baad1094d3e278b2929866017c
 }
 
 /* Navbar */
@@ -65,7 +72,11 @@ body {
   color: white;
   padding: 5rem 2rem 6rem;
   position: relative;
+<<<<<<< HEAD
   background-image: url('/path-to-banner-image.jpg');
+=======
+  background-image: url('/path-to-banner-image.jpg'); 
+>>>>>>> 9c412fe03ab6c8baad1094d3e278b2929866017c
   background-size: cover;
   background-position: center;
   text-align: center;
