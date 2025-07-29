@@ -1,20 +1,34 @@
 <template>
-  <div class="card">
-    <div class="image-container">
-      <img :src="idea.medium_image.url" loading="lazy" :alt="idea.title" />
+  <article class="idea-card">
+    <div class="idea-card__image-wrapper">
+      <img 
+        v-lazy="idea.medium_image[0]?.url || idea.small_image[0]?.url" 
+        :alt="idea.title"
+        class="idea-card__image"
+      />
     </div>
-    <div class="card-content">
-      <p class="date">{{ formatDate(idea.published_at) }}</p>
-      <h3 class="title">{{ idea.title }}</h3>
+    <div class="idea-card__content">
+      <time class="idea-card__date" :datetime="idea.published_at">
+        {{ formatDate(idea.published_at) }}
+      </time>
+      <h3 class="idea-card__title">{{ idea.title }}</h3>
     </div>
-  </div>
+  </article>
 </template>
 
 <script setup>
-defineProps(['idea'])
+import { computed } from 'vue'
+
+const props = defineProps({
+  idea: {
+    type: Object,
+    required: true
+  }
+})
 
 const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString('id-ID', {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
@@ -23,115 +37,82 @@ const formatDate = (dateString) => {
 </script>
 
 <style scoped>
-.card {
+.idea-card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   transition: all 0.3s ease;
+  cursor: pointer;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.card:hover {
+.idea-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-.image-container {
-  overflow: hidden;
+.idea-card__image-wrapper {
   position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
 }
 
-.image-container img {
+.idea-card__image {
   width: 100%;
-  height: 200px;
+  height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
 
-.card:hover .image-container img {
+.idea-card:hover .idea-card__image {
   transform: scale(1.05);
 }
 
-.card-content {
-  padding: 1.2rem;
-  flex-grow: 1;
+.idea-card__content {
+  padding: 1.25rem;
+  flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
 
-.date {
-  font-size: 0.8rem;
-  color: #888;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
+.idea-card__date {
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-weight: 400;
 }
 
-.title {
+.idea-card__title {
+  font-size: 1rem;
   font-weight: 600;
-  font-size: 1.1rem;
   line-height: 1.4;
-  color: #333;
+  color: #1f2937;
   margin: 0;
   display: -webkit-box;
   line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  flex-grow: 1;
+  flex: 1;
 }
 
-/* RESPONSIVE STYLES */
-@media (max-width: 768px) {
-  .image-container img {
-    height: 180px;
-  }
-  
-  .card-content {
-    padding: 1rem;
-  }
-  
-  .title {
-    font-size: 1rem;
-    line-clamp: 2;
-  }
-  
-  .date {
-    font-size: 0.75rem;
-  }
+/* Loading state for lazy images */
+.idea-card__image[lazy="loading"] {
+  background-color: #f3f4f6;
 }
 
-@media (max-width: 480px) {
-  .image-container img {
-    height: 160px;
-  }
-  
-  .card-content {
-    padding: 0.8rem;
-  }
-  
-  .title {
-    font-size: 0.95rem;
-  }
+.idea-card__image[lazy="error"] {
+  background-color: #fee2e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@media (max-width: 360px) {
-  .image-container img {
-    height: 140px;
-  }
-  
-  .card-content {
-    padding: 0.7rem;
-  }
-  
-  .title {
-    font-size: 0.9rem;
-  }
-  
-  .date {
-    font-size: 0.7rem;
-  }
+.idea-card__image[lazy="error"]::after {
+  content: "Image not available";
+  color: #ef4444;
+  font-size: 0.875rem;
 }
 </style>

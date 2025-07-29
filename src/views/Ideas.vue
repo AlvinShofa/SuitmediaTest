@@ -1,361 +1,475 @@
 <template>
-  <!-- BANNER -->
-  <section class="banner">
-    <div class="banner-content">
-      <h1>Ideas</h1>
-      <p>Where all our great things begin</p>
-    </div>
-  </section>
-
-  <!-- CONTENT WRAPPER -->
-  <div class="container">
-    <!-- FILTER & SHOWING -->
-    <div class="top-bar">
-      <div class="showing">Showing {{ startIndex }} - {{ endIndex }} of {{ totalItems }}</div>
-      <div class="filters">
-        <label>Show per page:
-          <select v-model="perPage" @change="onFilterChange">
-            <option v-for="n in [10, 20, 50]" :key="n">{{ n }}</option>
-          </select>
-        </label>
-        <label>Sort by:
-          <select v-model="sort" @change="onFilterChange">
-            <option value="-published_at">Newest</option>
-            <option value="published_at">Oldest</option>
-          </select>
-        </label>
+  <div class="ideas-page">
+    <!-- Banner Section -->
+    <section class="banner">
+      <div class="banner__content">
+        <h1 class="banner__title">Ideas</h1>
+        <p class="banner__subtitle">Where all our great things begin</p>
       </div>
-    </div>
+    </section>
 
-    <!-- LIST -->
-    <div class="grid">
-      <IdeaCard v-for="idea in ideas" :key="idea.id" :idea="idea" />
-    </div>
+    <!-- Main Content -->
+    <div class="container">
+      <!-- Controls Bar -->
+      <div class="controls-bar">
+        <div class="controls-bar__info">
+          <span class="showing-text">
+            Showing {{ startIndex }} - {{ endIndex }} of {{ totalItems }}
+          </span>
+        </div>
+        
+        <div class="controls-bar__filters">
+          <div class="filter-group">
+            <label for="per-page" class="filter-label">Show per page:</label>
+            <select 
+              id="per-page"
+              v-model="perPage" 
+              @change="handleFilterChange"
+              class="filter-select"
+            >
+              <option v-for="option in perPageOptions" :key="option" :value="option">
+                {{ option }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="sort-by" class="filter-label">Sort by:</label>
+            <select 
+              id="sort-by"
+              v-model="sort" 
+              @change="handleFilterChange"
+              class="filter-select"
+            >
+              <option value="-published_at">Newest</option>
+              <option value="published_at">Oldest</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
-    <!-- PAGINATION -->
-    <div class="pagination">
-      <button @click="changePage(page - 1)" :disabled="page === 1" class="nav-btn">«</button>
-      
-      <button
-        v-for="pageNum in visiblePages"
-        :key="pageNum"
-        @click="changePage(pageNum)"
-        :class="{ active: page === pageNum, dots: pageNum === '...' }"
-        :disabled="pageNum === '...'"
-      >
-        {{ pageNum }}
-      </button>
-      
-      <button @click="changePage(page + 1)" :disabled="page === totalPages" class="nav-btn">»</button>
+      <!-- Loading State -->
+      <div v-if="isLoading" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading ideas...</p>
+      </div>
+
+      <!-- Ideas Grid -->
+      <div v-else-if="ideas.length > 0" class="ideas-grid">
+        <IdeaCard 
+          v-for="idea in ideas" 
+          :key="idea.id" 
+          :idea="idea" 
+        />
+      </div>
+
+      <!-- Empty State -->
+      <div v-else class="empty-state">
+        <p>No ideas found.</p>
+      </div>
+
+      <!-- Pagination -->
+      <nav class="pagination" aria-label="Ideas pagination" v-if="totalPages > 1">
+        <button 
+          @click="changePage(currentPage - 1)" 
+          :disabled="currentPage === 1 || isLoading"
+          class="pagination__button pagination__button--nav"
+          aria-label="Previous page"
+        >
+          ‹
+        </button>
+        
+        <template v-for="pageNum in visiblePages" :key="pageNum">
+          <button
+            v-if="pageNum !== '...'"
+            @click="changePage(pageNum)"
+            :class="{
+              'pagination__button': true,
+              'pagination__button--active': currentPage === pageNum
+            }"
+            :disabled="isLoading"
+            :aria-label="`Go to page ${pageNum}`"
+            :aria-current="currentPage === pageNum ? 'page' : undefined"
+          >
+            {{ pageNum }}
+          </button>
+          <span v-else class="pagination__ellipsis">…</span>
+        </template>
+        
+        <button 
+          @click="changePage(currentPage + 1)" 
+          :disabled="currentPage === totalPages || isLoading"
+          class="pagination__button pagination__button--nav"
+          aria-label="Next page"
+        >
+          ›
+        </button>
+      </nav>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import axios from 'axios'
 import IdeaCard from '../components/IdeaCard.vue'
 
+// Reactive state
 const ideas = ref([])
-const page = ref(1)
+const currentPage = ref(1)
 const perPage = ref(10)
 const sort = ref('-published_at')
 const totalPages = ref(1)
 const totalItems = ref(0)
+const isLoading = ref(false)
 
+// Constants
+const perPageOptions = [10, 20, 50]
+
+// API functions
 const fetchIdeas = async () => {
-  const res = await axios.get('https://suitmedia-backend.suitdev.com/api/ideas', {
-    params: {
-      'page[number]': page.value,
-      'page[size]': perPage.value,
-      append: ['small_image', 'medium_image'],
-      sort: sort.value
-    }
-  })
-  ideas.value = res.data.data
-  totalItems.value = res.data.meta.total
-  totalPages.value = res.data.meta.last_page
-}
-
-const changePage = (newPage) => {
-  if (newPage >= 1 && newPage <= totalPages.value && newPage !== '...') {
-    page.value = newPage
-    fetchIdeas()
+  try {
+    isLoading.value = true
+    
+    const response = await axios.get('https://suitmedia-backend.suitdev.com/api/ideas', {
+      params: {
+        'page[number]': currentPage.value,
+        'page[size]': perPage.value,
+        append: ['small_image', 'medium_image'],
+        sort: sort.value
+      }
+    })
+    
+    ideas.value = response.data.data
+    totalItems.value = response.data.meta.total
+    totalPages.value = response.data.meta.last_page
+  } catch (error) {
+    console.error('Error fetching ideas:', error)
+    ideas.value = []
+  } finally {
+    isLoading.value = false
   }
 }
 
-const onFilterChange = () => {
-  page.value = 1
+// Event handlers
+const changePage = (newPage) => {
+  if (newPage >= 1 && newPage <= totalPages.value && !isLoading.value) {
+    currentPage.value = newPage
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+
+const handleFilterChange = () => {
+  currentPage.value = 1
   fetchIdeas()
 }
 
-const startIndex = computed(() => (page.value - 1) * perPage.value + 1)
-const endIndex = computed(() => Math.min(page.value * perPage.value, totalItems.value))
+// Computed properties
+const startIndex = computed(() => {
+  return totalItems.value === 0 ? 0 : (currentPage.value - 1) * perPage.value + 1
+})
 
-// Smart pagination logic - hanya menampilkan 6 elemen maksimal
+const endIndex = computed(() => {
+  return Math.min(currentPage.value * perPage.value, totalItems.value)
+})
+
 const visiblePages = computed(() => {
-  const current = page.value
-  const total = totalPages.value
   const pages = []
+  const maxVisible = 7
+  const current = currentPage.value
+  const total = totalPages.value
 
-  if (total <= 6) {
-    // Jika total halaman <= 6, tampilkan semua
+  if (total <= maxVisible) {
     for (let i = 1; i <= total; i++) {
       pages.push(i)
     }
   } else {
-    // Jika total halaman > 6, gunakan logika smart pagination
-    if (current <= 3) {
-      // Halaman awal: 1, 2, 3, 4, ..., last-1, last
-      pages.push(1, 2, 3, 4, '...', total)
-    } else if (current >= total - 2) {
-      // Halaman akhir: 1, 2, ..., last-3, last-2, last-1, last
-      pages.push(1, 2, '...', total - 3, total - 2, total - 1, total)
-    } else {
-      // Halaman tengah: 1, 2, ..., current, ..., last-1, last
-      pages.push(1, 2, '...', current, '...', total - 1, total)
+    pages.push(1)
+    
+    if (current > 4) {
+      pages.push('...')
+    }
+    
+    const start = Math.max(2, current - 1)
+    const end = Math.min(total - 1, current + 1)
+    
+    for (let i = start; i <= end; i++) {
+      if (i !== 1 && i !== total) {
+        pages.push(i)
+      }
+    }
+    
+    if (current < total - 3) {
+      pages.push('...')
+    }
+    
+    if (total > 1) {
+      pages.push(total)
     }
   }
-
+  
   return pages
 })
 
-onMounted(fetchIdeas)
+// Watchers
+watch(currentPage, fetchIdeas)
+
+// Lifecycle
+onMounted(() => {
+  fetchIdeas()
+})
 </script>
 
 <style scoped>
-/* BANNER */
+.ideas-page {
+  min-height: 100vh;
+}
+
+/* Banner Section */
 .banner {
   position: relative;
-  height: 340px;
+  height: 280px;
+  background: linear-gradient(135deg, #eb682f 0%, #d45620 100%);
   background-image: url('@/assets/banner.webp');
   background-size: cover;
   background-position: center;
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 93%);
+  background-blend-mode: overlay;
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-  max-width: 1200px;
-  margin: auto;
+  margin-bottom: 2rem;
 }
 
-.banner-content {
+.banner__content {
   text-align: center;
   color: white;
+  z-index: 1;
 }
 
-.banner-content h1 {
-  font-size: 2.8rem;
-  margin-bottom: 0.3rem;
+.banner__title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  color: #fcf5f1;
 }
 
-.banner-content p {
-  font-size: 1.1rem;
+.banner__subtitle {
+  font-size: 1.25rem;
+  font-weight: 400;
+  margin: 0;
+  opacity: 0.95;
+  color: #fcf5f1;
 }
 
-/* CONTAINER */
+/* Container */
 .container {
   max-width: 1200px;
-  margin: auto;
-  padding: 2rem;
+  margin: 0 auto;
+  padding: 0 2rem 3rem;
 }
 
-/* TOP BAR */
-.top-bar {
+/* Controls Bar */
+.controls-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 2rem;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
   gap: 1rem;
 }
 
-.filters {
+.controls-bar__info {
+  flex: 1;
+}
+
+.showing-text {
+  font-size: 0.95rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.controls-bar__filters {
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
 }
 
-.filters label {
+.filter-group {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.filter-label {
+  font-size: 0.9rem;
+  color: #374151;
+  font-weight: 500;
   white-space: nowrap;
 }
 
-.filters select {
-  padding: 0.3rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+.filter-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
   font-size: 0.9rem;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
 }
 
-.showing {
-  font-size: 0.9rem;
-  color: #555;
+.filter-select:focus {
+  outline: none;
+  border-color: #eb682f;
+  box-shadow: 0 0 0 3px rgba(235, 104, 47, 0.1);
 }
 
-/* GRID */
-.grid {
+/* Loading State */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: #6b7280;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #eb682f;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Ideas Grid */
+.ideas-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
 }
 
-/* PAGINATION */
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #6b7280;
+}
+
+/* Pagination */
 .pagination {
   display: flex;
   justify-content: center;
-  gap: 0.4rem;
-  margin-top: 2rem;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 3rem;
 }
 
-.pagination button {
+.pagination__button {
   border: none;
-  padding: 0.5rem 0.8rem;
-  border-radius: 50%;
-  background: #eee;
-  color: #333;
-  font-weight: bold;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: #f9fafb;
+  color: #374151;
+  font-weight: 500;
   cursor: pointer;
-  min-width: 40px;
-  height: 40px;
+  transition: all 0.2s ease;
+  min-width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
 }
 
-.pagination button:hover:not(:disabled) {
-  background: #ddd;
+.pagination__button:hover:not(:disabled) {
+  background: #f3f4f6;
+  color: #111827;
 }
 
-.pagination .active {
-  background: #ff5a00;
-  color: #fff;
+.pagination__button--active {
+  background: #eb682f;
+  color: white;
 }
 
-.pagination button:disabled {
+.pagination__button--active:hover {
+  background: #d45620;
+}
+
+.pagination__button:disabled {
   opacity: 0.5;
-  cursor: default;
+  cursor: not-allowed;
 }
 
-.pagination .dots {
-  background: transparent;
-  cursor: default;
-  color: #999;
+.pagination__button--nav {
+  font-size: 1.25rem;
 }
 
-.pagination .dots:hover {
-  background: transparent;
+.pagination__ellipsis {
+  padding: 0.75rem 0.5rem;
+  color: #6b7280;
 }
 
-.pagination .nav-btn {
-  border-radius: 4px;
-  font-size: 1.2rem;
-}
-
-/* RESPONSIVE STYLES */
+/* Responsive Design */
 @media (max-width: 768px) {
-  .banner {
-    height: 400px;
-    margin: 0 1rem;
+  .banner__title {
+    font-size: 2.5rem;
   }
   
-  .banner-content h1 {
-    font-size: 2.2rem;
-  }
-  
-  .banner-content p {
-    font-size: 1rem;
+  .banner__subtitle {
+    font-size: 1.1rem;
   }
   
   .container {
-    padding: 1rem;
+    padding: 0 1rem 2rem;
   }
   
-  .top-bar {
+  .controls-bar {
     flex-direction: column;
     align-items: stretch;
+  }
+  
+  .controls-bar__filters {
+    flex-direction: column;
     gap: 1rem;
   }
   
-  .filters {
-    justify-content: center;
-  }
-  
-  .showing {
-    text-align: center;
-  }
-  
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1rem;
+  .ideas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
   }
   
   .pagination {
-    gap: 0.2rem;
+    flex-wrap: wrap;
+    gap: 0.25rem;
   }
   
-  .pagination button {
-    min-width: 35px;
-    height: 35px;
-    padding: 0.4rem 0.6rem;
-    font-size: 0.9rem;
+  .pagination__button {
+    min-width: 40px;
+    height: 40px;
+    padding: 0.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .banner {
-    height: 160px;
-    margin: 0 0.5rem;
+    height: 220px;
   }
   
-  .banner-content h1 {
-    font-size: 1.8rem;
+  .banner__title {
+    font-size: 2rem;
   }
   
-  .banner-content p {
-    font-size: 0.9rem;
-  }
-  
-  .container {
-    padding: 0.5rem;
-  }
-  
-  .grid {
+  .ideas-grid {
     grid-template-columns: 1fr;
-    gap: 0.8rem;
-  }
-  
-  .filters {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .filters label {
-    justify-content: space-between;
-  }
-  
-  .pagination button {
-    min-width: 30px;
-    height: 30px;
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 360px) {
-  .pagination {
-    gap: 0.1rem;
-  }
-  
-  .pagination button {
-    min-width: 28px;
-    height: 28px;
-    padding: 0.2rem 0.4rem;
   }
 }
 </style>

@@ -1,26 +1,31 @@
 <template>
-  <header :class="{ hidden: isHidden }" >
-    <div class="navbar" style="border-top-left-radius: 12px; border-top-right-radius: 12px;">
-      <div class="logo"> 
-        <img src="@/assets/logo.png" alt="Suitmedia" /> 
+  <header class="header" :class="{ 'header--hidden': isHidden }">
+    <div class="navbar">
+      <div class="navbar__logo">
+        <img src="@/assets/logo.png" alt="Suitmedia" />
       </div>
-      
-      <!-- Mobile menu button -->
-      <button class="mobile-menu-btn" @click="toggleMobileMenu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-      
-      <!-- Navigation -->
-      <nav :class="{ 'mobile-open': isMobileMenuOpen }">
-        <ul>
-          <li><a href="#" @click="closeMobileMenu">Work</a></li>
-          <li><a href="#" @click="closeMobileMenu">About</a></li>
-          <li><a href="#" @click="closeMobileMenu">Services</a></li>
-          <li><a href="#" class="active" @click="closeMobileMenu">Ideas</a></li>
-          <li><a href="#" @click="closeMobileMenu">Careers</a></li>
-          <li><a href="#" @click="closeMobileMenu">Contact</a></li>
+      <nav class="navbar__nav">
+        <ul class="nav-list">
+          <li class="nav-list__item">
+            <a href="#" class="nav-list__link">Work</a>
+          </li>
+          <li class="nav-list__item">
+            <a href="#" class="nav-list__link">About</a>
+          </li>
+          <li class="nav-list__item">
+            <a href="#" class="nav-list__link">Services</a>
+          </li>
+          <li class="nav-list__item">
+            <router-link to="/" class="nav-list__link nav-list__link--active">
+              Ideas
+            </router-link>
+          </li>
+          <li class="nav-list__item">
+            <a href="#" class="nav-list__link">Careers</a>
+          </li>
+          <li class="nav-list__item">
+            <a href="#" class="nav-list__link">Contact</a>
+          </li>
         </ul>
       </nav>
     </div>
@@ -31,179 +36,114 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const isHidden = ref(false)
-const isMobileMenuOpen = ref(false)
-let lastScroll = 0
-
-const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
-}
-
-const closeMobileMenu = () => {
-  isMobileMenuOpen.value = false
-}
+let lastScrollY = 0
 
 const handleScroll = () => {
-  const currentScroll = window.scrollY
-  isHidden.value = currentScroll > lastScroll && currentScroll > 100
-  lastScroll = currentScroll
-}
-
-const handleResize = () => {
-  if (window.innerWidth > 768) {
-    isMobileMenuOpen.value = false
+  const currentScrollY = window.scrollY
+  
+  if (currentScrollY > 100) {
+    isHidden.value = currentScrollY > lastScrollY
+  } else {
+    isHidden.value = false
   }
+  
+  lastScrollY = currentScrollY
 }
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
-  window.addEventListener('resize', handleResize)
+  window.addEventListener('scroll', handleScroll, { passive: true })
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
-  window.removeEventListener('resize', handleResize)
 })
 </script>
 
 <style scoped>
-header {
+.header {
   position: fixed;
   top: 0;
-  width: 100%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  transition: top 0.3s ease;
-  z-index: 999;
+  left: 0;
+  right: 0;
+  background-color: #eb682f;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
 }
 
-.hidden {
-  top: -100px;
+.header--hidden {
+  transform: translateY(-100%);
 }
 
 .navbar {
   max-width: 1200px;
-  margin: auto;
+  margin: 0 auto;
   padding: 1rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #eb682f;
-  position: relative;
 }
 
-.logo img {
-  height: 30px;
+.navbar__logo img {
+  height: 32px;
+  width: auto;
 }
 
-.mobile-menu-btn {
-  display: none;
-  flex-direction: column;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  z-index: 1001;
-}
-
-.mobile-menu-btn span {
-  display: block;
-  width: 25px;
-  height: 3px;
-  background-color: white;
-  margin: 3px 0;
-  transition: 0.3s;
-}
-
-.mobile-menu-btn:hover span {
-  background-color: #fcf5f1;
-}
-
-nav ul {
+.nav-list {
   list-style: none;
   display: flex;
   gap: 2rem;
   margin: 0;
   padding: 0;
+  align-items: center;
 }
 
-nav ul li a {
+.nav-list__link {
   text-decoration: none;
   color: white;
   font-weight: 500;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
   position: relative;
-  transition: color 0.3s ease;
 }
 
-nav ul li a:hover {
+.nav-list__link:hover {
   color: #fcf5f1;
 }
 
-nav ul li a.active {
+.nav-list__link--active {
   color: #fcf5f1;
-  text-decoration: underline;
-  text-underline-offset: 15px;
 }
 
-/* Mobile Styles */
+.nav-list__link--active::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #fcf5f1;
+}
+
+/* Mobile responsiveness */
 @media (max-width: 768px) {
   .navbar {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
   }
   
-  .mobile-menu-btn {
-    display: flex;
+  .nav-list {
+    gap: 1rem;
+    font-size: 0.9rem;
   }
   
-  nav {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: #eb682f;
-    transform: translateY(-100%);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    border-radius: 0 0 12px 12px;
-  }
-  
-  nav.mobile-open {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
-  }
-  
-  nav ul {
-    flex-direction: column;
-    gap: 0;
-    padding: 1rem;
-  }
-  
-  nav ul li {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  nav ul li:last-child {
-    border-bottom: none;
-  }
-  
-  nav ul li a {
-    display: block;
-    padding: 1rem 0;
-    color: white;
-  }
-  
-  nav ul li a.active {
-    text-underline-offset: 5px;
+  .navbar__logo img {
+    height: 28px;
   }
 }
 
-@media (max-width: 480px) {
-  .navbar {
-    padding: 0.8rem;
-  }
-  
-  .logo img {
-    height: 25px;
+@media (max-width: 640px) {
+  .nav-list {
+    display: none; /* You might want to implement a mobile menu here */
   }
 }
 </style>
